@@ -13,6 +13,12 @@ card_numbers = []
 def reset_game(event):
     print("calling 'reset_game'")
     #complete me
+    generate_card()
+    shuffle_caller()
+    reset_calls()
+    document.querySelector("#current_call").innerHTML = " "
+    document.querySelector("#win_game").close()
+
 
 def check_cell(event):
     print("calling 'check_cell'")
@@ -22,13 +28,29 @@ def check_cell(event):
     cell_val = int(event.target.innerHTML)
 
     # complete me
+    coords = cell_id.split("_")[1:]
+    x = int(coords[0])
+    y = int(coords[1])
+    print(x)
+    print(y)
+
+    if cell_val in called_numbers and not card_matrix.is_position_marked(x, y):
+        highlight_card_cell("#" + cell_id)
+        if card_matrix.mark_position(x, y):
+            document.querySelector("#win_game").showModal()
+
 
 def call_next(event):
     global all_bingo_numbers
     print("calling 'call_next'")
 
     #complete me
-
+    if len(all_bingo_numbers) > 0:
+        next_number = all_bingo_numbers.pop(0) # Remove and return the first number in the list
+        document.querySelector("#current_call").innerHTML = next_number
+        add_called(next_number)
+    else:
+        document.querySelector("#current_call").innerHTML = "No more numbers left to call."
 
 # INTERNAL FUNCTIONS
 def shuffle_caller():
@@ -36,13 +58,20 @@ def shuffle_caller():
     print("Calling 'shuffle_caller'")
 
     # complete me
- 
- 
-def reset_calls():   
+    all_bingo_numbers = list(range(1, 76))
+    random.shuffle(all_bingo_numbers)
+    for x in all_bingo_numbers:
+        id = f"#cell_{x}"
+        reset_caller_cell(id)
+
+
+def reset_calls():
     global called_numbers
     print("Calling 'reset_calls'")
 
     # complete me
+    called_numbers.clear()
+    document.querySelector("#called_numbers").innerHTML = " "
 
 
 def generate_card():
@@ -50,13 +79,28 @@ def generate_card():
     print("Calling 'generate_card'")
 
     # complete me
+    card_numbers = (list(range(1,76)))
+    random.shuffle(card_numbers)
+    card_numbers = card_numbers[:25]
+
+    for x in range(1,6):
+        for y in range(1,6):
+            id = "#cell_" + str(x) + "_" + str(y)
+            document.querySelector(id).innerHTML = str(card_numbers.pop())
+            reset_card_cell(id)
+
+
+
 
 
 def add_called(num):
     global called_numbers
     print("Calling 'add_called'")
 
-    # complete me
+    # complete me + use the join functino in python
+    called_numbers.append(num)
+    highlight_caller_cell(f"#cell_{num}")
+    document.querySelector("#called_numbers").innerHTML = ", ".join(str(x) for x in called_numbers)
 
 
 # adds/removes highlight CSS classes from cells (these are complete, don't change)
